@@ -1,3 +1,4 @@
+import RegisterTeacher from "@/components/form/RegisterTeacher";
 import {
   Card,
   CardContent,
@@ -20,7 +21,9 @@ const page = () => {
             Teacher Details
           </CardTitle>
         </CardHeader>
-        <CardContent></CardContent>
+        <CardContent>
+          <RegisterTeacher />
+        </CardContent>
       </Card>
     </section>
   );
