@@ -14,7 +14,5 @@ export const teacherSchema = z.object({
     .max(10, { error: "maximum 10 character" }),
   streams: z.string({ error: "enter your stream" }),
 
-  subject: z
-    .string({ error: "select sutabile subject" })
-    .min(1, { error: " select subject" }),
+  subject: z.array(z.string()).min(1, "Select at least one subject"),
 });

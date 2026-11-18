@@ -1,13 +1,25 @@
 "use client";
+
 import { teacherSchema } from "@/lib/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
+import { ChevronDown } from "lucide-react";
+import { Controller, useForm, useWatch } from "react-hook-form";
+
+import { teacherSchemaType } from "@/lib/types";
 import { Button } from "../shadcnui/button";
+import { Checkbox } from "../shadcnui/checkbox";
 import { Field, FieldError, FieldLabel } from "../shadcnui/field";
 import { Input } from "../shadcnui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "../shadcnui/popover";
 
 const RegisterTeacher = () => {
-  const { control } = useForm({
+  const {
+    control,
+    setValue,
+    reset,
+    handleSubmit,
+    formState: { isSubmitting, isDirty },
+  } = useForm({
     resolver: zodResolver(teacherSchema),
 
     defaultValues: {
@@ -15,92 +27,226 @@ const RegisterTeacher = () => {
       email: "",
       phNumber: "",
       streams: "",
-      subject: "",
+      subject: [],
     },
+
     mode: "all",
   });
 
-  // steream data Store
+  const handleSubmitForm = (fdata: teacherSchemaType) => {
+    console.log(fdata);
+    reset();
+  };
 
-  const stream = ["Arts", "Comerce", "Science"];
+  // Stream data
+  const stream = ["Arts", "Commerce", "Science"];
+
+  // Stream subjects
+  const streamSubjects = {
+    Arts: [
+      "History",
+      "Geography",
+      "Education",
+      "Political Science",
+      "English (Compulsory)",
+      "Bengali (Compulsory)",
+    ],
+
+    Commerce: [
+      "Accountancy",
+      "Business Studies",
+      "Economics",
+      "Business Mathematics",
+      "English (Compulsory)",
+      "Bengali (Compulsory)",
+    ],
+
+    Science: [
+      "Physics",
+      "Chemistry",
+      "Mathematics",
+      "Biology",
+      "English (Compulsory)",
+      "Bengali (Compulsory)",
+    ],
+  };
+
+  // Watch stream value
+  const selectedStream = useWatch({
+    control,
+    name: "streams",
+  });
+
+  // Get subjects dynamically
+  const subjects =
+    streamSubjects[selectedStream as keyof typeof streamSubjects] ?? [];
+
   return (
-    <form className="grid w-full place-items-center gap-6">
+    <form
+      onSubmit={handleSubmit(handleSubmitForm)}
+      className="grid w-full place-items-center gap-6">
+      {/* Full Name */}
       <Controller
         name="fullName"
         control={control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="form-rhf-demo-title">Name:</FieldLabel>
+            <FieldLabel>Name:</FieldLabel>
+
             <Input
               {...field}
               type="text"
               aria-invalid={fieldState.invalid}
               placeholder="Enter your full name"
-              autoComplete="family-name"
+              autoComplete="name"
             />
+
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
       />
 
+      {/* Email */}
       <Controller
         name="email"
         control={control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="form-rhf-demo-title">Email:</FieldLabel>
+            <FieldLabel>Email:</FieldLabel>
+
             <Input
               {...field}
               type="email"
               aria-invalid={fieldState.invalid}
               placeholder="Enter your email"
-              autoComplete="mobile email"
+              autoComplete="email"
             />
+
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
       />
+
+      {/* Phone */}
       <Controller
         name="phNumber"
         control={control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="form-rhf-demo-title">Number:</FieldLabel>
+            <FieldLabel>Number:</FieldLabel>
+
             <Input
               {...field}
-              type="number"
+              type="tel"
               aria-invalid={fieldState.invalid}
               placeholder="Enter your number"
               autoComplete="tel"
             />
+
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
       />
 
+      {/* Stream */}
       <Controller
         name="streams"
         control={control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="form-rhf-demo-title">Stream:</FieldLabel>
+            <FieldLabel>Stream:</FieldLabel>
 
             <div className="grid w-full grid-cols-3 gap-3">
-              {stream.map((stream) => (
+              {stream.map((item) => (
                 <Button
-                  className={``}
-                  key={stream}
-                  onClick={() => field.onChange(stream)}
-                  variant={field.value === stream ? "default" : "outline"}>
-                  Arts
+                  type="button"
+                  key={item}
+                  onClick={() => {
+                    if (field.value !== item) {
+                      field.onChange(item);
+
+                      // Clear previous subjects
+                      setValue("subject", [], {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                      });
+                    }
+                  }}
+                  variant={field.value === item ? "default" : "outline"}>
+                  {item}
                 </Button>
               ))}
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </div>
+          </Field>
+        )}
+      />
+
+      {/* Multiple Subjects */}
+
+      <Controller
+        name="subject"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel>Subjects:</FieldLabel>
+
+            <Popover>
+              <PopoverTrigger
+                render={
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={!selectedStream}
+                    className="w-full justify-between font-normal">
+                    {field.value.length ?
+                      `${field.value.length} subjects selected`
+                    : "Select Subjects"}
+
+                    <ChevronDown className="size-4" />
+                  </Button>
+                }
+              />
+
+              <PopoverContent>
+                <div className="w-full">
+                  {subjects.map((subject) => (
+                    <label
+                      key={subject}
+                      htmlFor={subject}
+                      className="hover:bg-accent flex cursor-pointer items-center gap-3 rounded-md p-2">
+                      <Checkbox
+                        id={subject}
+                        checked={field.value.includes(subject)}
+                        onCheckedChange={(checked) => {
+                          field.onChange(
+                            checked ?
+                              [...field.value, subject]
+                            : field.value.filter((item) => item !== subject),
+                          );
+                        }}
+                      />
+
+                      <span className="text-sm">{subject}</span>
+                    </label>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
 
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
       />
+
+      {/* Submit */}
+
+      <Button
+        disabled={!isDirty || isSubmitting}
+        type="submit"
+        className="w-full">
+        Register Teacher
+      </Button>
     </form>
   );
 };
