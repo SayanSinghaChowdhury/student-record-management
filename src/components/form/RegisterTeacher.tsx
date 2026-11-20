@@ -32,6 +32,10 @@ const RegisterTeacher = () => {
 
     mode: "all",
   });
+  const selectedStream = useWatch({
+    control,
+    name: "streams",
+  });
 
   const handleSubmitForm = (fdata: teacherSchemaType) => {
     console.log(fdata);
@@ -72,10 +76,6 @@ const RegisterTeacher = () => {
   };
 
   // Watch stream value
-  const selectedStream = useWatch({
-    control,
-    name: "streams",
-  });
 
   // Get subjects dynamically
   const subjects =
@@ -155,7 +155,7 @@ const RegisterTeacher = () => {
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
             <FieldLabel>Stream:</FieldLabel>
-
+            {/* stream select */}
             <div className="grid w-full grid-cols-3 gap-3">
               {stream.map((item) => (
                 <Button
