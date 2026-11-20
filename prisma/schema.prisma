@@ -11,3 +11,20 @@ generator client {
 datasource db {
     provider = "sqlite"
 }
+
+
+
+model Teacher {
+ id String @unique() @default(uuid())
+
+fullName String 
+
+email String 
+
+phNumber String
+
+streams String
+
+subject  String
+    
+}
