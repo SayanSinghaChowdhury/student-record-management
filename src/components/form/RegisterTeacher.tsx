@@ -78,7 +78,7 @@ const RegisterTeacher = () => {
     const { isSuccess, message, title } = await teacherServerAction(fdata);
     if (isSuccess) {
       toast.add({
-        type: "success",
+        type: "isSuccess",
         title: title,
         description: message,
         priority: "high",
