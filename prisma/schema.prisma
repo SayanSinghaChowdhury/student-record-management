@@ -2,29 +2,37 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client"
-    output   = "../generated/prisma"
-    // Target runtime environment. Default: nodejs
-    // runtime  = "nodejs"
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+  // Target runtime environment. Default: nodejs
+  // runtime  = "nodejs"
 }
 
 datasource db {
-    provider = "sqlite"
+  provider = "sqlite"
 }
 
-
-
+//  relation  with subject stream & subject connect with teacher  
 model Teacher {
- id String @unique() @default(uuid())
+  id               String     @id @default(uuid())
+  fullName         String
+  email            String
+  phNumber         String
+  CategoryRelation Category[]
+}
 
-fullName String 
+// relation  with subject stream & subject 
+model Category {
+  id        String    @id @default(uuid())
+  stream    String
+  subjects  Subject[]
+  teacher   Teacher   @relation(fields: [teacherId], references: [id])
+  teacherId String
+}
 
-email String 
-
-phNumber String
-
-streams String
-
-subject  String
-    
+model Subject {
+  id         String   @id @default(uuid())
+  subject    String
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
 }

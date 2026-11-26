@@ -6,45 +6,18 @@ import { ChevronDown } from "lucide-react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 
 import { teacherSchemaType } from "@/lib/types";
+import teacherServerAction from "@/server/teacherServerAction";
+import { useRouter } from "next/navigation";
 import { Button } from "../shadcnui/button";
 import { Checkbox } from "../shadcnui/checkbox";
 import { Field, FieldError, FieldLabel } from "../shadcnui/field";
 import { Input } from "../shadcnui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "../shadcnui/popover";
+import { toast } from "../shadcnui/toast";
 
 const RegisterTeacher = () => {
-  const {
-    control,
-    setValue,
-    reset,
-    handleSubmit,
-    formState: { isSubmitting, isDirty },
-  } = useForm({
-    resolver: zodResolver(teacherSchema),
-
-    defaultValues: {
-      fullName: "",
-      email: "",
-      phNumber: "",
-      streams: "",
-      subject: [],
-    },
-
-    mode: "all",
-  });
-  const selectedStream = useWatch({
-    control,
-    name: "streams",
-  });
-
-  const handleSubmitForm = (fdata: teacherSchemaType) => {
-    console.log(fdata);
-    reset();
-  };
-
   // Stream data
   const stream = ["Arts", "Commerce", "Science"];
-
   // Stream subjects
   const streamSubjects = {
     Arts: [
@@ -75,7 +48,58 @@ const RegisterTeacher = () => {
     ],
   };
 
+  const { push } = useRouter();
+  const {
+    control,
+    setValue,
+    reset,
+    handleSubmit,
+    formState: { isSubmitting, isDirty },
+  } = useForm({
+    resolver: zodResolver(teacherSchema),
+
+    defaultValues: {
+      fullName: "",
+      email: "",
+      phNumber: "",
+      stream: "",
+      subject: [],
+    },
+
+    mode: "all",
+  });
   // Watch stream value
+  const selectedStream = useWatch({
+    control,
+    name: "stream",
+  });
+
+  const handleSubmitForm = async (fdata: teacherSchemaType) => {
+    const { isSuccess, message, title } = await teacherServerAction(fdata);
+    if (isSuccess) {
+      toast.add({
+        type: "success",
+        title: title,
+        description: message,
+        priority: "high",
+      });
+
+      reset();
+
+      push("/student");
+    } else {
+      toast.add({
+        type: "error",
+        title: title,
+        description: message,
+        priority: "high",
+      });
+    }
+
+    console.log(fdata);
+
+    reset();
+  };
 
   // Get subjects dynamically
   const subjects =
@@ -150,7 +174,7 @@ const RegisterTeacher = () => {
 
       {/* Stream */}
       <Controller
-        name="streams"
+        name="stream"
         control={control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
