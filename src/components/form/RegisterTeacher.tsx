@@ -188,7 +188,6 @@ const RegisterTeacher = () => {
                   onClick={() => {
                     if (field.value !== item) {
                       field.onChange(item);
-
                       // Clear previous subjects
                       setValue("subject", [], {
                         shouldValidate: true,
