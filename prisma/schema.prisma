@@ -14,25 +14,24 @@ datasource db {
 
 //  relation  with subject stream & subject connect with teacher  
 model Teacher {
-  id               String     @id @default(uuid())
-  fullName         String
-  email            String
-  phNumber         String
-  CategoryRelation Category[]
+  id       String    @id @default(uuid())
+  fullName String
+  email    String
+  phNumber String
+  streams  Stream[]
+  subjects Subject[]
 }
 
-// relation  with subject stream & subject 
-model Category {
-  id        String    @id @default(uuid())
+model Stream {
+  id        String  @id @default(uuid())
   stream    String
-  subjects  Subject[]
-  teacher   Teacher   @relation(fields: [teacherId], references: [id])
   teacherId String
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
 }
 
 model Subject {
-  id         String   @id @default(uuid())
-  subject    String
-  category   Category @relation(fields: [categoryId], references: [id])
-  categoryId String
+  id        String  @id @default(uuid())
+  subject   String
+  teacherId String
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
 }

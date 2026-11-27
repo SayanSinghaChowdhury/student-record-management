@@ -5,6 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/shadcnui/card";
+import prisma from "@/lib/dbClient/prisma";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -12,7 +13,14 @@ export const metadata: Metadata = {
   description: "student-record-management|Student-Registration-page",
 };
 
-const page = () => {
+const page = async () => {
+  const teacherData = await prisma.teacher.findMany({
+    include: {
+      streams: true,
+      subjects: true,
+    },
+  });
+
   return (
     <section className="grid h-dvh items-center justify-center">
       <Card className="w-sm">
@@ -22,7 +30,7 @@ const page = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <RegisterStudent />
+          <RegisterStudent teacher={teacherData} />
         </CardContent>
       </Card>
     </section>

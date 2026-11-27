@@ -75,7 +75,9 @@ const RegisterTeacher = () => {
   });
 
   const handleSubmitForm = async (fdata: teacherSchemaType) => {
+    console.log(fdata);
     const { isSuccess, message, title } = await teacherServerAction(fdata);
+
     if (isSuccess) {
       toast.add({
         type: "isSuccess",

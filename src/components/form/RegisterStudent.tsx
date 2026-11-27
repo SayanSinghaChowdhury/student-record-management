@@ -3,12 +3,32 @@
 import { studentSchema } from "@/lib/schema";
 import { studentSchemaType } from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
+import { ChevronDownIcon } from "lucide-react";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { Button } from "../shadcnui/button";
 import { Field, FieldError, FieldLabel } from "../shadcnui/field";
 import { Input } from "../shadcnui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "../shadcnui/popover";
 
-const RegisterStudent = () => {
+type studentRegisterForm = {
+  teacher: {
+    id: string;
+    fullName: string;
+    email: string;
+
+    streams: {
+      id: string;
+      stream: string;
+    }[];
+
+    subjects: {
+      id: string;
+      subject: string;
+    }[];
+  }[];
+};
+
+const RegisterStudent = ({ teacher }: studentRegisterForm) => {
   // Stream data
   const stream = ["Arts", "Commerce", "Science"];
 
@@ -23,6 +43,12 @@ const RegisterStudent = () => {
       teacher: "",
     },
     mode: "all",
+  });
+
+  // Watch stream value
+  const selectedStream = useWatch({
+    control,
+    name: "stream",
   });
 
   const handleSubmitForm = (fdata: studentSchemaType) => {
@@ -117,6 +143,63 @@ const RegisterStudent = () => {
           </Field>
         )}
       />
+
+      <Controller
+        name="teacher"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel>Subjects:</FieldLabel>
+
+            <Popover>
+              <PopoverTrigger
+                render={
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={!selectedStream}
+                    className="w-full justify-between font-normal">
+                    {field.value.length ?
+                      `${field.value.length} subjects selected`
+                    : "Select Subjects"}
+
+                    <ChevronDownIcon className="size-4" />
+                  </Button>
+                }
+              />
+
+              <PopoverContent>
+                {/* <div className="w-full">
+                  {teacher.map((streams) => (
+                    <label
+                      key={streams.fullName}
+                      htmlFor={streams.fullName}
+                      className="hover:bg-accent flex cursor-pointer items-center gap-3 rounded-md p-2">
+                      <Checkbox
+                        id={streams.fullName}
+                        checked={field.value.includes(streams.fullName)}
+                      />
+
+                      <span className="text-sm">{streams.fullName}</span>
+                    </label>
+                  ))}
+                </div> */}
+              </PopoverContent>
+            </Popover>
+
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
+
+      {/* submit */}
+
+      <Button
+        className={"w-full"}
+        type="submit"
+        variant={"default"}>
+        Register Student
+      </Button>
     </form>
   );
 };

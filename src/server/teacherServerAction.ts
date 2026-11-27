@@ -12,20 +12,21 @@ export const teacherServerAction = async (fdata: teacherSchemaType) => {
         email: fdata.email,
         phNumber: fdata.phNumber,
 
-        CategoryRelation: {
+        // Create Stream
+        streams: {
           create: {
-            streams: fdata.stream,
-
-            subjects: {
-              create: fdata.subject.map((item) => ({
-                subject: item,
-              })),
-            },
+            stream: fdata.stream,
           },
+        },
+
+        // Create multiple Subjects
+        subjects: {
+          create: fdata.subject.map((item) => ({
+            subject: item,
+          })),
         },
       },
     });
-
     return {
       isSuccess: true,
 
